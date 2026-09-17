@@ -7,12 +7,64 @@
   const enhancementAssets = ['kyla-enhancements.css', 'kyla-enhancements.js'];
   let enhancementPromise;
   let interactionStarted = false;
+  let frameGuardInstalled = false;
 
   const idle = (callback, timeout = 2000) => {
     if ('requestIdleCallback' in window) {
       return window.requestIdleCallback(callback, { timeout });
     }
     return window.setTimeout(callback, Math.min(timeout, 1200));
+  };
+
+  const installFrameGuard = () => {
+    if (frameGuardInstalled || typeof window.requestAnimationFrame !== 'function' || typeof window.cancelAnimationFrame !== 'function') return;
+    frameGuardInstalled = true;
+
+    const nativeRequestAnimationFrame = window.requestAnimationFrame.bind(window);
+    const nativeCancelAnimationFrame = window.cancelAnimationFrame.bind(window);
+    const jobs = new Map();
+    let nextId = 1;
+    let lastFrame = 0;
+    const frameInterval = 1000 / 30;
+
+    const schedule = (id) => {
+      const job = jobs.get(id);
+      if (!job || document.hidden || job.nativeId !== null) return;
+      job.nativeId = nativeRequestAnimationFrame((timestamp) => {
+        const current = jobs.get(id);
+        if (!current) return;
+        current.nativeId = null;
+        if (document.hidden) return;
+        if (timestamp - lastFrame < frameInterval) {
+          schedule(id);
+          return;
+        }
+        lastFrame = timestamp;
+        jobs.delete(id);
+        current.callback(timestamp);
+      });
+    };
+
+    window.requestAnimationFrame = (callback) => {
+      const id = nextId++;
+      jobs.set(id, { callback, nativeId: null });
+      schedule(id);
+      return id;
+    };
+
+    window.cancelAnimationFrame = (id) => {
+      const job = jobs.get(id);
+      if (!job) return;
+      if (job.nativeId !== null) nativeCancelAnimationFrame(job.nativeId);
+      jobs.delete(id);
+    };
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) return;
+      jobs.forEach((job, id) => {
+        if (job.nativeId === null) schedule(id);
+      });
+    }, { passive: true });
   };
 
   const loadEnhancements = () => {
@@ -94,6 +146,7 @@
     if (window.__kylaPerformanceReady) return;
     window.__kylaPerformanceReady = true;
     installAmbientBudget();
+    installFrameGuard();
     syncMotionWeather();
 
     const season = root.getElementById('season-select');
