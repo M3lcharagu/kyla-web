@@ -1,36 +1,27 @@
-# KYLA — The 3D Kilimanjaro Penthouse
+# KYLA — Kilimani Penthouse Estate
 
-KYLA is a no-build, vanilla HTML/CSS/JS command surface styled as a dark-luxury Kilimanjaro penthouse. It is local-first: the interface is fully usable as a browser simulation, while the future KYLA backend bridge is clearly labelled wherever real execution would begin.
+KYLA is a static, mobile-first command centre for a fictional Kilimani estate. The existing local agent directory, 14-room source of truth, chats, task loops, proactive pings, command routing/history, SOPHIA deck/settings and localStorage state remain client-side and build-free.
 
-## Included behavior
+## Local simulation
 
-- **Fourteen mapped rooms and agents** rendered from one data model, with each room linked to its specialist agent.
-- **Hash-routed agent pages** (`#agent-r1` through `#agent-r14`) with a dedicated agent profile, temperament, specialty, sample works, current loop state, prompt centre, and input/output pipeline.
-- **Bidirectional private chats** opened from room cards or agent pages. Messages have timestamps, typing indicators, local simulated agent replies, unread badges, per-agent personality, and a persisted master mute for proactive pings.
-- **Prompt centres and command history** through the global command bar, per-room command bars, and per-agent prompt bars. Keyword routing covers trading/XAUUSD (R3), editing/reels/render/dock (R6), study/research (R10), and coding/site/build (R4); commands move through queued, processing, delivered, and done states and appear in recent history.
-- **SOPHIA Master Deck** with all-agent status lights, activity, unread counts, a persisted proactive-agent mute, and a broadcast command that produces a local response from every mapped agent plus a SOPHIA summary.
-- **Autonomous task loops** for every agent: visible specialty task chips, progress bars, room activity logs, rotating work placeholders, completion events, resting intervals, and visibility-aware ticking. These are deliberately simulated locally and do not claim external work was completed.
-- **Proactive, muteable pings** on a randomized 45–90 second local timer, suppressed while the page is hidden and disabled by the master mute control.
-- **`localStorage` persistence** for chat threads, unread counts, command history, task-loop progress/activity, mute state, and recent local state under `kyla-state`.
-- **Three.js exterior scene with fallback.** The optional Three.js CDN scene is guarded by an error handler and runtime `try/catch`; if the CDN or WebGL is unavailable, the CSS-styled exterior remains available and the page marks the fallback state instead of failing the command surface.
-- **Mobile-first presentation** with reduced-motion-aware scene animation and no build step or runtime dependency beyond the optional Three.js CDN.
+Serve the repository root with any static server; no build step is needed:
 
-## Local simulation limitation
+```bash
+python3 -m http.server 8080
+```
 
-This is intentionally a front-end simulation. Commands, chats, task loops, broadcasts, unread state, mute state, and recent history stay in the browser's `localStorage`. The site does **not** fetch prices, run code, render media, send real messages, or complete external work. The UI identifies simulated output and the local-simulation/future-backend boundary. Real execution is designed to happen through Mel typing commands into this surface and the KYLA backend bridge when that bridge comes online.
+Open `http://localhost:8080/`. A direct `file://` open works for the static page, but browsers may restrict fullscreen, WebAudio, device orientation and WebXR there. Commands and agent replies are deliberately local simulations and never claim external work completed.
 
-## Run locally
+## VR / Walkthrough controls
 
-Open `index.html` in a browser, or serve this folder with any static server. The project contains only:
+The fixed **Enter VR / Walkthrough** button opens an accessible fullscreen first-person route: skyline → estate gate → pool path → villa entrance → lobby. The tour uses cinematic easing and can be interrupted. Mouse drag and one-finger touch drag look around with clamped yaw/pitch. The **Head-bob** toggle is optional, and **Motion look** requests device-orientation permission only after the user taps it.
 
-- `index.html` — semantic shell, deck, rooms, broadcast, chat modal, command surfaces, and fallback markup.
-- `style.css` — responsive dark-luxury presentation and CSS exterior fallback.
-- `script.js` — agent data, routing, persistence, chat simulation, command history, broadcast, autonomous loops, proactive pings, and guarded Three.js scene.
+Glowing keyboard-focusable markers teleport/glide to each route stop; use Enter or Space after focusing a marker. Escape or **Exit** closes the mode. If Three.js/WebGL is unavailable, the UI falls back to a no-crash lightweight route surface.
 
-GitHub Pages serves the same root files directly from the `main` branch (`/`).
+When `navigator.xr` reports immersive VR support, a **VR headset** control appears after the user opens the walkthrough. It requests a basic `immersive-vr` session on that gesture and silently falls back if unavailable or denied; this is intentionally not a full controller implementation.
 
-## GitHub Pages
+**Ambient audio** is optional in SOPHIA settings. It is generated with WebAudio (a quiet oscillator pad plus filtered noise city bed), starts only after an explicit user gesture, persists its mute preference, and is stopped/disconnected when immersive mode exits. No audio files are loaded. Reduced-motion preferences lower/disable cinematic movement and mobile devices use capped pixel ratio and smaller star counts.
 
-Live site: <https://m3lcharagu.github.io/kyla-web/>
+## Deployment
 
-Pages is configured as a legacy static site from **`main` / `/`**. A deployment can take a short time after a commit; the browser-facing simulation remains usable without a backend connection. The repository is <https://github.com/M3lcharagu/kyla-web>.
+The site is plain static HTML/CSS/JS and is published from the `main` branch through GitHub Pages: https://m3lcharagu.github.io/kyla-web/
