@@ -1,2 +1,115 @@
-/* KYLA motion bridge plus local identity/walk layers. */
-(()=>{'use strict';const BASELINE='https://raw.githubusercontent.com/M3lcharagu/kyla-web/4c63efc67174fa12f3e08271c5c2652c4486dd135/script.js';const add=()=>{['kyla-enhancements.css'].forEach(h=>{if(!document.querySelector(`link[data-kyla-layer="${h}"]`)){const l=document.createElement('link');l.rel='stylesheet';l.href=h;l.dataset.kylaLayer=h;document.head.append(l)}});['kyla-enhancements.js'].forEach(s=>{if(!document.querySelector(`script[data-kyla-layer="${s}"]`)){const x=document.createElement('script');x.src=s;x.defer=true;x.dataset.kylaLayer=s;document.head.append(x)}})};const init=()=>{if(window.__kylaMotionReady)return;window.__kylaMotionReady=true;const b=document.body,c=document.getElementById('chat-modal'),w=document.getElementById('season-select');const sync=()=>{b.classList.toggle('motion-listening',Boolean(c&&!c.hidden));b.dataset.motionWeather=w?.value==='rainy'?'rain':w?.value==='cloudy'?'cloudy':''};sync();w?.addEventListener('change',sync,{passive:true});c&&new MutationObserver(sync).observe(c,{attributes:true,attributeFilter:['hidden']});document.addEventListener('submit',e=>{if(e.target?.id==='chat-form'){b.classList.add('motion-talking');setTimeout(()=>b.classList.remove('motion-talking'),2600)}});add()};const s=document.createElement('script');s.src=BASELINE;s.async=false;s.onload=init;s.onerror=init;document.head.append(s)})();
+/* KYLA performance bridge: keep the first paint local, then opt into the richer layers. */
+(() => {
+  'use strict';
+
+  const root = document;
+  const body = root.body;
+  const enhancementAssets = ['kyla-enhancements.css', 'kyla-enhancements.js'];
+  let enhancementPromise;
+  let interactionStarted = false;
+
+  const idle = (callback, timeout = 2000) => {
+    if ('requestIdleCallback' in window) {
+      return window.requestIdleCallback(callback, { timeout });
+    }
+    return window.setTimeout(callback, Math.min(timeout, 1200));
+  };
+
+  const loadEnhancements = () => {
+    if (enhancementPromise) return enhancementPromise;
+
+    enhancementPromise = new Promise((resolve) => {
+      const finish = () => resolve(true);
+      const css = enhancementAssets[0];
+      const js = enhancementAssets[1];
+
+      if (!root.querySelector(`link[data-kyla-layer="${css}"]`)) {
+        const link = root.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = css;
+        link.dataset.kylaLayer = css;
+        link.onload = finish;
+        link.onerror = finish;
+        root.head.appendChild(link);
+      }
+
+      if (!root.querySelector(`script[data-kyla-layer="${js}"]`)) {
+        const script = root.createElement('script');
+        script.src = js;
+        script.defer = true;
+        script.dataset.kylaLayer = js;
+        script.onload = finish;
+        script.onerror = finish;
+        root.head.appendChild(script);
+      } else {
+        finish();
+      }
+    });
+
+    return enhancementPromise;
+  };
+
+  const installAmbientBudget = () => {
+    const style = root.createElement('style');
+    style.id = 'kyla-performance-guard';
+    style.textContent = `
+      /* Keep the initial shell composited and make hidden-tab work free. */
+      .command-center-grid, .cc-agent-card, .dashboard-card, .room-card { contain: layout paint; }
+      .cc-agent-card, .dashboard-card, .room-card, .button, a { backface-visibility: hidden; }
+      [data-kyla-hidden="true"] *, [data-kyla-hidden="true"] *::before, [data-kyla-hidden="true"] *::after {
+        animation-play-state: paused !important;
+      }
+      @media (max-width: 760px) {
+        .immersive-stage { contain: layout paint; }
+        .immersive-stage canvas { max-width: 100%; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+      }
+    `;
+    root.head.appendChild(style);
+
+    const syncVisibility = () => {
+      const hidden = root.hidden || document.visibilityState === 'hidden';
+      body.dataset.kylaHidden = hidden ? 'true' : 'false';
+    };
+    document.addEventListener('visibilitychange', syncVisibility, { passive: true });
+    syncVisibility();
+  };
+
+  const syncMotionWeather = () => {
+    const select = root.getElementById('season-select');
+    if (!select) return;
+    body.dataset.motionWeather = select.value === 'rainy' ? 'rain' : select.value === 'harmattan' ? 'cloudy' : '';
+  };
+
+  const beginInteraction = () => {
+    if (interactionStarted) return;
+    interactionStarted = true;
+    loadEnhancements();
+    body.classList.add('motion-listening');
+  };
+
+  const init = () => {
+    if (window.__kylaPerformanceReady) return;
+    window.__kylaPerformanceReady = true;
+    installAmbientBudget();
+    syncMotionWeather();
+
+    const season = root.getElementById('season-select');
+    season?.addEventListener('change', syncMotionWeather, { passive: true });
+
+    ['pointerdown', 'keydown', 'touchstart', 'scroll'].forEach((eventName) => {
+      root.addEventListener(eventName, beginInteraction, { once: true, passive: eventName !== 'keydown' });
+    });
+
+    /* Avatars and walk mode are useful after the shell is readable, not on the critical path. */
+    idle(() => loadEnhancements(), 3500);
+  };
+
+  if (root.readyState === 'loading') {
+    root.addEventListener('DOMContentLoaded', init, { once: true });
+  } else {
+    init();
+  }
+})();
