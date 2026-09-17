@@ -1,101 +1,25 @@
-(() => {
-  'use strict';
-
-  const AGENTS = [
-    { id: 'claude', name: 'Claude', mark: 'CL', room: 'R1', roomName: 'Humanitas', role: 'Strategy + synthesis', tone: 'Warm, precise, service-led.' },
-    { id: 'codex', name: 'Codex', mark: 'CX', room: 'R4', roomName: 'Industria', role: 'Code + release', tone: 'Methodical, exact, quietly fast.' },
-    { id: 'copilot', name: 'Copilot', mark: 'CP', room: 'R3', roomName: 'Temperantia', role: 'Risk + order flow', tone: 'Curious, systematic, momentum-minded.' },
-    { id: 'cursor', name: 'Cursor', mark: 'CU', room: 'R2', roomName: 'Patientia', role: 'Site craft + debugging', tone: 'Precise, observant, unhurried.' },
-    { id: 'docker-agent', name: 'Docker Agent', mark: 'DK', room: 'R6', roomName: 'Gula', role: 'Delivery + environments', tone: 'Decisive, visual, production-ready.' },
-    { id: 'droid', name: 'Droid', mark: 'DR', room: 'R5', roomName: 'Luxuria', role: 'Creative direction', tone: 'Observant, visual, composition-first.' },
-    { id: 'shell', name: 'Shell', mark: 'SH', room: 'R7', roomName: 'Superbia', role: 'Routines + automation', tone: 'Grounded, direct, quietly capable.' }
-  ];
-  const KEY = 'kyla-command-center-v1';
-  const $ = (selector, root = document) => root.querySelector(selector);
-  const esc = (value) => String(value == null ? '' : value).replace(/[&<>"']/g, (char) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[char]));
-
-  function load() {
-    try {
-      const parsed = JSON.parse(localStorage.getItem(KEY) || '{}');
-      return { threads: parsed.threads && typeof parsed.threads === 'object' ? parsed.threads : {}, activity: Array.isArray(parsed.activity) ? parsed.activity : [] };
-    } catch (_) { return { threads: {}, activity: [] }; }
-  }
-  function save(state) { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (_) {} }
-  function timeLabel(timestamp) { try { return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); } catch (_) { return 'now'; } }
-  function getAgent(id) { return AGENTS.find((agent) => agent.id === id) || AGENTS[0]; }
-  function defaultThread(agent) { return [{ from: 'agent', text: `${agent.name} online. Local mock thread ready for a useful next move.`, at: Date.now() }]; }
-  function reply(agent, text) { return `${agent.name} queued “${text.slice(0, 74)}${text.length > 74 ? '…' : ''}”. Mock only — no external execution or provider call was made.`; }
-
-  function threadMarkup(messages) {
-    return messages.slice(-8).map((message) => `<div class="cc-message ${message.from === 'user' ? 'user' : ''}"><small>${message.from === 'user' ? 'YOU' : esc(message.agentName || 'AGENT')} · ${esc(timeLabel(message.at))}</small>${esc(message.text)}</div>`).join('');
-  }
-
-  function cardMarkup(agent, state) {
-    const messages = state.threads[agent.id] || defaultThread(agent);
-    return `<article class="cc-agent-card" data-agent-card="${esc(agent.id)}">
-      <header class="cc-agent-head"><div><div class="cc-agent-name"><div class="cc-agent-mark" aria-hidden="true">${esc(agent.mark)}</div><div><h3>${esc(agent.name)}</h3><a class="cc-room-link" href="#room-${esc(agent.room.toLowerCase())}">${esc(agent.room)} / ${esc(agent.roomName)}</a></div></div></div><span class="cc-status"><i></i>ONLINE / MOCK</span></header>
-      <p class="cc-description"><strong>${esc(agent.role)}.</strong> ${esc(agent.tone)}</p>
-      <div class="cc-thread-label">OUTPUT / LOCAL THREAD</div>
-      <div class="cc-thread" data-thread="${esc(agent.id)}" aria-live="polite">${threadMarkup(messages)}</div>
-      <form class="cc-form" data-command-form="${esc(agent.id)}"><label class="sr-only" for="cc-input-${esc(agent.id)}">Command ${esc(agent.name)}</label><input id="cc-input-${esc(agent.id)}" name="command" placeholder="Send a mock command ↗" autocomplete="off"><button type="submit">Send ↗</button></form>
-    </article>`;
-  }
-
-  function renderActivity(state) {
-    const target = $('#cc-activity');
-    if (!target) return;
-    if (!state.activity.length) { target.innerHTML = '<p class="empty-state">No commands yet. The surface is ready.</p>'; return; }
-    target.innerHTML = state.activity.slice(-5).reverse().map((item) => `<p class="activity-line"><b>${esc(item.agentName)}</b> · ${esc(item.text)}<br><small>${esc(timeLabel(item.at))}</small></p>`).join('');
-  }
-
-  function updateStats(state) {
-    const total = state.activity.length;
-    const rooms = $('#cc-stat-rooms');
-    const agents = $('#cc-stat-agents');
-    const active = $('#cc-stat-active');
-    const commands = $('#cc-stat-commands');
-    if (rooms) rooms.textContent = '14';
-    if (agents) agents.textContent = String(AGENTS.length);
-    if (active) active.textContent = String(AGENTS.length);
-    if (commands) commands.textContent = String(total);
-  }
-
-  function submit(agentId, input, thread, state) {
-    const text = input.value.trim();
-    if (!text) return;
-    const agent = getAgent(agentId);
-    const now = Date.now();
-    const messages = state.threads[agentId] || defaultThread(agent);
-    messages.push({ from: 'user', text, at: now });
-    messages.push({ from: 'agent', agentName: agent.name, text: reply(agent, text), at: now + 1 });
-    state.threads[agentId] = messages.slice(-20);
-    state.activity.push({ agentName: agent.name, text, at: now });
-    state.activity = state.activity.slice(-30);
-    save(state);
-    thread.innerHTML = threadMarkup(state.threads[agentId]);
-    thread.scrollTop = thread.scrollHeight;
-    input.value = '';
-    updateStats(state);
-    renderActivity(state);
-  }
-
-  function init() {
-    const root = $('#command-center-grid');
-    if (!root) return;
-    const state = load();
-    root.innerHTML = AGENTS.map((agent) => cardMarkup(agent, state)).join('');
-    root.querySelectorAll('[data-command-form]').forEach((form) => {
-      form.addEventListener('submit', (event) => {
-        event.preventDefault();
-        const input = $('input[name="command"]', form);
-        const card = form.closest('[data-agent-card]');
-        const thread = card ? $('[data-thread]', card) : null;
-        if (input && thread) submit(form.dataset.commandForm, input, thread, state);
-      });
-    });
-    updateStats(state);
-    renderActivity(state);
-  }
-
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
-})();
+(()=>{'use strict';
+const A=[
+{id:'claude',name:'Claude',mark:'CL',room:'R1',roomName:'Humanitas',role:'Strategy + philosophy',tone:'Warm, precise, service-led.',spec:'strategy, philosophy, synthesis'},
+{id:'codex',name:'Codex',mark:'CX',room:'R4',roomName:'Industria',role:'Code + release',tone:'Methodical, exact, quietly fast.',spec:'code, architecture, release hygiene'},
+{id:'copilot',name:'Copilot',mark:'CP',room:'R3',roomName:'Temperantia',role:'Code + QA',tone:'Curious, systematic, momentum-minded.',spec:'coding, review, tests, risk'},
+{id:'cursor',name:'Cursor',mark:'CU',room:'R2',roomName:'Patientia',role:'Frontend craft',tone:'Precise, observant, unhurried.',spec:'frontend, UX, debugging, iteration'},
+{id:'docker-agent',name:'Docker Agent',mark:'DK',room:'R6',roomName:'Gula',role:'Deployment',tone:'Decisive, visual, production-ready.',spec:'containers, deployment, environments'},
+{id:'droid',name:'Droid',mark:'DR',room:'R5',roomName:'Luxuria',role:'Automation',tone:'Observant, visual, composition-first.',spec:'automation, prompts, workflows'},
+{id:'shell',name:'Shell',mark:'SH',room:'R7',roomName:'Superbia',role:'System operations',tone:'Grounded, direct, quietly capable.',spec:'systems, routines, local ops'}];
+const KEY='kyla-command-center-v1', $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)], esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])), ts=()=>Date.now(), tl=t=>{try{return new Date(t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}catch(_){return'now'}};
+let S={threads:{},activity:[],statuses:{},settings:{weather:'clear'}}, active='claude', pending=new Set();
+function agent(id){return A.find(x=>x.id===id)||A[0]} function load(){try{let x=JSON.parse(localStorage.getItem(KEY)||'{}');S={threads:x.threads||{},activity:Array.isArray(x.activity)?x.activity.slice(-40):[],statuses:x.statuses||{},settings:{weather:'clear',...(x.settings||{})}}}catch(_){}} function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(_){}} function thread(a){return Array.isArray(S.threads[a.id])?S.threads[a.id]:(S.threads[a.id]=[{from:'agent',agentName:a.name,text:`${a.name} online. Local simulation ready for a useful next move.`,at:ts()}])} function log(text,who='KYLA'){S.activity.push({text,who,at:ts()});S.activity=S.activity.slice(-40);renderActivity();save()}
+function route(text){let q=text.toLowerCase();if(/deploy|container|docker|release/.test(q))return agent('docker-agent');if(/backtest|trade|market|risk|order/.test(q))return agent('copilot');if(/frontend|css|layout|mobile|ui|browser/.test(q))return agent('cursor');if(/automate|workflow|prompt/.test(q))return agent('droid');if(/server|shell|linux|logs|system|cron/.test(q))return agent('shell');if(/code|bug|build|test|javascript|html/.test(q))return agent('codex');return A[0]}
+function brain(a,t){let q=t.toLowerCase();if(q.includes('status report'))return`${a.name} status: local brain active, backend bridge idle. Focus: ${a.spec}. No external calls were made.`;if(q.includes('deploy check'))return a.id==='docker-agent'?'Deployment check simulated: artifact, environment, health route, and rollback path are ready for inspection. Nothing was deployed.':'I can route deployment checks to Docker Agent; this surface will not touch a provider.';if(q.includes('run backtest'))return'Backtest plan staged locally: define window, fees, sizing, and failure criteria, then compare to a baseline. No market data or orders are fetched.';if(/^\\s*open\\s+/.test(q))return'Opening the requested estate room; the transition stays local to this page.';if(a.id==='claude')return`Strategy first: name the outcome, choose the smallest reversible move, and keep the human meaning visible. I would frame “${t.slice(0,72)}” as a decision with a clear next action.`;if(a.id==='codex')return`Implementation note: isolate “${t.slice(0,72)}” into a small function, define its contract, add a deterministic test, then review the diff. No runtime write is connected.`;if(a.id==='copilot')return`I would pair the change with a QA matrix: happy path, empty state, mobile viewport, persistence, and one failure case. The safe next step for “${t.slice(0,72)}” is a reproducible test.`;if(a.id==='cursor')return`Frontend pass: preserve hierarchy, make the primary action one tap, and verify focus order at narrow widths. I would inspect “${t.slice(0,72)}” as a visual system.`;if(a.id==='docker-agent')return`Release shape: pin the artifact, validate configuration, run health checks, and keep rollback explicit. “${t.slice(0,72)}” is a review only; no provider call is connected.`;if(a.id==='droid')return`Automation sketch: trigger → normalize input → perform one idempotent action → report evidence. I would keep “${t.slice(0,72)}” observable and reversible.`;return`System view: inspect inputs, process state, logs, and the smallest safe command. “${t.slice(0,72)}” is simulated; no shell, file system, or service is executed.`}
+function setStatus(id,v){S.statuses[id]=v;$$(`[data-status="${id}"]`).forEach(n=>{n.dataset.state=v;n.textContent=v.toUpperCase()});$$(`[data-agent-card="${id}"]`).forEach(n=>n.dataset.status=v)} function typing(target,on){if(!target)return;let n=$('.kyla-typing',target);if(on&&!n){n=document.createElement('div');n.className='kyla-typing';n.setAttribute('role','status');n.innerHTML='<span></span><span></span><span></span><em>thinking locally</em>';target.append(n)}if(!on&&n)n.remove()}
+function msg(m){return`<div class="cc-message ${m.from==='user'?'user':''}"><small>${m.from==='user'?'YOU':esc(m.agentName||'AGENT')} · ${tl(m.at)}</small><div>${esc(m.text)}</div></div>`} function draw(a,target){if(target){target.innerHTML=thread(a).slice(-12).map(msg).join('');target.scrollTop=target.scrollHeight}}
+function renderActivity(){let x=$('#cc-activity');if(x)x.innerHTML=S.activity.length?S.activity.slice(-6).reverse().map(i=>`<p class="activity-line"><b>${esc(i.who)}</b> · ${esc(i.text)}<br><small>${tl(i.at)}</small></p>`).join(''):'<p class="empty-state">No commands yet. The surface is ready.</p>';let c=$('#cc-stat-commands');if(c)c.textContent=S.activity.length}
+function card(a){let st=S.statuses[a.id]||'idle';return`<article class="cc-agent-card" data-agent-card="${a.id}" data-status="${st}"><header class="cc-agent-head"><div class="cc-agent-name"><div class="cc-agent-mark" aria-hidden="true">${a.mark}</div><div><h3>${a.name}</h3><a class="cc-room-link" href="#room-${a.room.toLowerCase()}">${a.room} / ${a.roomName}</a></div></div><span class="cc-status" data-status="${a.id}" data-state="${st}"><i></i>${st.toUpperCase()}</span></header><p class="cc-description"><strong>${a.role}.</strong> ${a.tone}<span class="kyla-local-label">LOCAL BRAIN · BACKEND BRIDGE READY</span></p><div class="cc-thread" data-thread="${a.id}" aria-live="polite"></div><div class="kyla-quick-chips" aria-label="Suggested commands"><button type="button" data-quick="open trading room">open trading room</button><button type="button" data-quick="status report">status report</button><button type="button" data-quick="deploy check">deploy check</button><button type="button" data-quick="run backtest">run backtest</button></div><form class="cc-form" data-command-form="${a.id}"><label class="sr-only" for="cc-input-${a.id}">Command ${a.name}</label><input id="cc-input-${a.id}" name="command" placeholder="Ask ${a.name} a local question" autocomplete="off"><button type="submit">Send</button></form></article>`}
+function navigate(text){let q=text.toLowerCase().replace(/^\\s*open\\s+/,'').trim(),map={'trading room':'r3',trading:'r3','code room':'r4',code:'r4',frontend:'r2','deploy room':'r6',deployment:'r6',creative:'r5',automation:'r5',ops:'r7',systems:'r7',strategy:'r1',humanitas:'r1'},id=map[q];if(!id){let n=$$('.room').find(x=>x.id.toLowerCase()===`room-${q}`||$('h3',x)?.textContent.toLowerCase().includes(q));id=n&&n.id.replace('room-','')}if(!id)return false;let n=$(`#room-${id}`);if(n){n.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'});n.classList.add('immersive-focus');setTimeout(()=>n.classList.remove('immersive-focus'),1500)}log(`Opened ${id.toUpperCase()} from a local command`,'MEL');return true}
+function send(a,raw,target,input){let text=String(raw||'').trim();if(!text||pending.has(a.id))return;if(input)input.value='';let th=thread(a);th.push({from:'user',text,at:ts()});S.threads[a.id]=th.slice(-30);log(`${a.name}: ${text}`,a.name);setStatus(a.id,'thinking');draw(a,target);typing(target,true);pending.add(a.id);if(/^\\s*open\\s+/.test(text))navigate(text);let wait=matchMedia('(prefers-reduced-motion: reduce)').matches?80:540;setTimeout(()=>{th.push({from:'agent',agentName:a.name,text:brain(a,text),at:ts()});S.threads[a.id]=th.slice(-30);typing(target,false);setStatus(a.id,'active');draw(a,target);log(`${a.name} replied locally`,a.name);save();pending.delete(a.id);setTimeout(()=>{if(!pending.has(a.id))setStatus(a.id,'idle')},8000)},wait);save()}
+function modal(a){let x=$('#chat-log');if(x)x.innerHTML=thread(a).slice(-18).map(m=>`<div class="chat-message ${m.from==='user'?'from-me':''}"><span>${m.from==='user'?'MEL':esc(a.name)}</span><p>${esc(m.text)}</p><small>${tl(m.at)}</small></div>`).join('');if(x)x.scrollTop=x.scrollHeight;let t=$('#chat-title');if(t)t.textContent=a.name;let s=$('#chat-subtitle');if(s)s.textContent=`${a.role} · LOCAL SIMULATION / BACKEND BRIDGE`;let p=$('#chat-portrait');if(p)p.textContent=a.mark}
+function clock(){let h=$('.header-state');if(!h||$('#nairobi-clock'))return;let x=document.createElement('span');x.id='nairobi-clock';h.append(x);let tick=()=>{try{x.textContent=`NAIROBI ${new Intl.DateTimeFormat('en-KE',{timeZone:'Africa/Nairobi',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(new Date())}`}catch(_){x.textContent='NAIROBI · LOCAL'}};tick();setInterval(tick,1000)}
+function style(){if($('#kyla-interactive-styles'))return;let s=document.createElement('style');s.id='kyla-interactive-styles';s.textContent=`.kyla-local-label{display:block;color:var(--gold,#efc982);font:10px Inter,sans-serif;letter-spacing:.1em;margin-top:8px}.kyla-quick-chips{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 4px}.kyla-quick-chips button{border:1px solid #4b4b4b;background:transparent;color:var(--sand,#e7ddce);border-radius:999px;padding:8px 10px;font:10px Inter,sans-serif;cursor:pointer}.kyla-quick-chips button:focus-visible,.kyla-quick-chips button:hover{border-color:var(--gold,#efc982);color:#fff}.cc-agent-card[data-status="thinking"]{border-color:var(--gold,#efc982)}.cc-status[data-state="thinking"]{color:#efc982}.cc-status[data-state="idle"]{opacity:.6}.cc-status[data-state="active"] i{animation:kyla-pulse 1.7s ease-in-out infinite}.kyla-typing{display:flex;align-items:center;gap:4px;color:#efc982;font:10px Inter,sans-serif;padding:6px 0}.kyla-typing span{width:5px;height:5px;border-radius:50%;background:currentColor;animation:kyla-dot 1s infinite}.kyla-typing em{margin-left:5px;font-style:normal;opacity:.75}.activity-line{border-left:2px solid var(--turq,#5fc9c0);padding-left:8px}.header-state #nairobi-clock{display:inline-block;margin-left:10px;color:var(--gold,#efc982);font-size:10px;letter-spacing:.08em}.kyla-estate-overlay{position:absolute;left:20px;bottom:22px;z-index:12;width:min(280px,calc(100% - 40px));padding:14px;border:1px solid #efc98277;border-radius:16px;background:#091018bb;backdrop-filter:blur(16px);color:#fff}.kyla-estate-overlay strong{display:block;font:11px Inter,sans-serif;letter-spacing:.12em}.kyla-estate-overlay small{color:#c8d0d0}.kyla-minimap{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:10px}.kyla-minimap button{min-height:34px;border:1px solid #ffffff35;border-radius:8px;background:#ffffff0d;color:#fff;font:10px Inter,sans-serif;cursor:pointer}.kyla-estate-transition{position:absolute;inset:0;z-index:20;pointer-events:none;background:radial-gradient(circle,#efc98200,#080d14 70%);opacity:0}.kyla-estate-transition.is-entering{animation:kyla-elevator 1.15s ease both}.immersive-pool::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,#ffffff55 48%,transparent 58%);background-size:220% 100%;animation:kyla-shimmer 5s ease-in-out infinite;pointer-events:none}@keyframes kyla-pulse{50%{opacity:.45;transform:scale(.7)}}@keyframes kyla-dot{0%,100%{opacity:.3}50%{opacity:1;transform:translateY(-3px)}}@keyframes kyla-shimmer{0%,35%{background-position:180% 0}70%,100%{background-position:-40% 0}}@keyframes kyla-elevator{0%{opacity:0;transform:scale(1.04)}25%,75%{opacity:1}100%{opacity:0;transform:scale(1)}}.immersive-focus{animation:kyla-focus .9s ease both}@keyframes kyla-focus{50%{box-shadow:0 0 0 5px #efc98266}}@media(max-width:760px){.kyla-estate-overlay{left:12px;bottom:12px;width:calc(100% - 24px)}.kyla-quick-chips button{min-height:36px}.header-state #nairobi-clock{display:block;margin:4px 0 0}}@media(prefers-reduced-motion:reduce){.kyla-typing span,.cc-status[data-state="active"] i,.immersive-pool::after{animation:none}.kyla-estate-transition.is-entering{animation:none;opacity:0}}`;document.head.append(s)}
+function estate(root){if(!root||$('.kyla-estate-overlay',root))return;let o=document.createElement('aside');o.className='kyla-estate-overlay';o.innerHTML='<strong>KYLA ESTATE · NAIROBI</strong><small>Clear / selected local weather · tap a room</small><div class="kyla-minimap">'+A.map(a=>`<button type="button" data-estate-room="${a.room.toLowerCase()}">${a.room}<br><small>${a.name}</small></button>`).join('')+'</div>';let tr=document.createElement('div');tr.className='kyla-estate-transition is-entering';root.append(o,tr);o.addEventListener('click',e=>{let b=e.target.closest('[data-estate-room]');if(!b)return;let t=$(`.immersive-target[data-kind="room"][data-room="${b.dataset.estateRoom}"]`,root);log(`Estate target tapped: ${b.dataset.estateRoom.toUpperCase()}`,'MEL');if(t)t.click();else navigate(`open ${b.dataset.estateRoom}`);tr.classList.remove('is-entering');void tr.offsetWidth;tr.classList.add('is-entering')});root.addEventListener('click',e=>{let t=e.target.closest&&e.target.closest('.immersive-target');if(t)log(`Immersive target tapped: ${t.textContent.trim().replace(/\\s+/g,' ').slice(0,40)}`,'MEL')})}
+function init(){load();style();clock();let root=$('#command-center-grid');if(!root)return;root.innerHTML=A.map(card).join('');A.forEach(a=>{draw(a,$(`[data-thread="${a.id}"]`));setStatus(a.id,S.statuses[a.id]||'idle')});$$('.cc-form',root).forEach(f=>f.addEventListener('submit',e=>{e.preventDefault();let i=$('input[name="command"]',f);send(agent(f.dataset.commandForm),i&&i.value,$(`[data-thread="${f.dataset.commandForm}"]`),i)}));$$('.kyla-quick-chips button',root).forEach(b=>b.addEventListener('click',()=>{let f=b.closest('article').querySelector('form'),i=f.querySelector('input');i.value=b.dataset.quick;f.requestSubmit()}));let gf=$('#global-command-form');if(gf)gf.addEventListener('submit',e=>{e.preventDefault();let i=$('#global-command'),a=route(i.value);active=a.id;send(a,i.value,$(`[data-thread="${a.id}"]`),i);log(`Routed command to ${a.name}`)});let cf=$('#chat-form');if(cf)cf.addEventListener('submit',e=>{e.preventDefault();let i=$('#chat-input'),a=agent(active);send(a,i.value,$('#chat-log'),i)});document.addEventListener('click',e=>{let b=e.target.closest&&e.target.closest('.chat-open');if(b){active=b.dataset.agent||active;setTimeout(()=>modal(agent(active)),0)}let l=e.target.closest&&e.target.closest('.immersive-launch');if(l)setTimeout(()=>{let r=$('#immersive-estate');if(r)estate(r)},50)});let obs=new MutationObserver(()=>{let r=$('#immersive-estate');if(r)estate(r)});obs.observe(document.body,{childList:true,subtree:true});renderActivity();setInterval(()=>{if(document.hidden||pending.size)return;let i=Math.floor(Date.now()/12000)%A.length;A.forEach((a,n)=>setStatus(a.id,n===i?'active':'idle'));save()},12000)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();})();
