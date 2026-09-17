@@ -1,1 +1,151 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#11100e"><meta name="description" content="KYLA — a cinematic Kilimani estate command centre."><title>KYLA — Kilimani Penthouse Estate</title><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="immersive.css"><script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js" defer onerror="document.documentElement.classList.add('three-unavailable')"></script><script src="script.js" defer></script><script src="immersive.js" defer></script></head><body><a class="skip-link" href="#rooms">Skip to rooms</a><header class="site-header" id="top"><a class="wordmark" href="#top">KYLA<em>—</em></a><nav aria-label="Primary"><a href="#top">HOME</a><a href="#estate">ESTATE</a><a href="#agents">AGENTS</a><a href="#deck">SOPHIA</a></nav><a class="header-state" href="#deck"><i></i>LOCAL SYSTEM ONLINE</a></header><main><section class="hero" aria-labelledby="hero-title"><div class="hero-copy reveal"><p class="eyebrow">KILIMANI / NAIROBI — PRIVATE ESTATE</p><h1 id="hero-title">The <em>working</em><br>penthouse.</h1><p class="hero-lede">A warm, quiet command centre above a leafy suburb — with a skyline view, a pool, and a crew for every useful move.</p><div class="hero-actions"><a class="button immersive-launch" href="#estate">ENTER ESTATE <span>↗</span></a><a class="text-link" href="#deck">SCROLL TO EXPLORE <span>↘</span></a></div></div><div class="estate-stage"><canvas id="scene-canvas" aria-hidden="true"></canvas><div class="css-fallback" aria-hidden="true"><div class="fallback-tower"><b></b></div><div class="fallback-villa villa-a"></div><div class="fallback-villa villa-b"></div><div class="fallback-pool"></div><div class="fallback-palm palm-a">♢</div><div class="fallback-palm palm-b">♢</div></div><div class="stage-caption"><span>EST. 2024 <strong>K</strong></span><span>PRIVATE / CLOUD-FIRST</span></div><div class="scroll-cue"><b>01</b><i></i>SCROLL TO EXPLORE</div><div id="weather-badge" class="weather-badge" aria-live="polite">Golden hour — clear</div></div></section><section id="estate" class="signal-bar shell reveal"><div><b>14</b><small>ROOMS<br>one connected house</small></div><div><b>08</b><small>AGENTS<br>the working crew</small></div><div><b>01</b><small>STANDARD<br>quiet excellence</small></div><p>Make the complex feel<br>like coming home.</p></section><section id="deck" class="shell section"><div class="section-heading reveal"><div><p class="eyebrow">02 / THE MANAGER'S DECK</p><h2>The house has<br><em>a point of view.</em></h2></div><p>One surface for every thread.<br>One standard for every move.</p></div><div class="deck-grid"><div class="deck-copy reveal"><p class="large-copy">KYLA is not another dashboard. It is the place where every thread gets a room, a rhythm, and a next move.</p><p>At the centre is <strong>SOPHIA</strong> — the overseer persona. She keeps rooms in conversation, routes work to the right specialist, and holds the standard when the day gets loud.</p><p class="simulation-note"><i></i> LOCAL SIMULATION / FUTURE BACKEND BRIDGE<br><small>Commands here never pretend external work completed.</small></p></div><article class="sophia-card reveal"><small>00 / 01 — ACTIVE PERSONA</small><b>S</b><span>THE OVERSEER</span><strong>SOPHIA</strong><em>“Clarity is a form of kindness.”</em><footer>strategy <i>✦</i> routing <i>✦</i> standard</footer></article></div><div class="deck-dashboard reveal"><div class="dashboard-title"><div><p class="eyebrow">MASTER DECK</p><h3>All agents, one pulse.</h3></div><label class="toggle"><input id="mute-toggle" type="checkbox"><span></span>Mute proactive angels</label></div><div id="status-grid" class="status-grid"></div><div class="settings-panel"><div><p class="eyebrow">SOPHIA SETTINGS</p><h3>Set the atmosphere.</h3></div><label>Season<select id="season-select"><option value="dry">Dry</option><option value="rainy">Rainy</option><option value="harmattan">Harmattan (cold)</option><option value="christmas">Christmas</option></select></label><label>Time of day <output id="time-output">18:00</output><input id="time-slider" type="range" min="0" max="24" value="18" step=".25"></label><button id="christmas-toggle" class="button subtle" type="button">Toggle Christmas mode</button></div></div><div id="agent-directory" class="agent-directory" aria-label="Agent directory"></div><div class="broadcast-row reveal"><div><p class="eyebrow">SOPHIA OVERRIDE / BROADCAST</p><h2>One voice.<br><em>Every room.</em></h2><p>Send a local simulation to the whole crew. Each mapped agent replies in its own voice.</p></div><div><form id="broadcast-form" class="command-form"><label class="sr-only" for="broadcast-input">Broadcast command</label><input id="broadcast-input" placeholder="Align today's top three priorities ↗" autocomplete="off"><button class="button" type="submit">Broadcast <span>↗</span></button></form><div id="broadcast-log" class="broadcast-log" aria-live="polite"><i></i> SOPHIA standing by for an override.</div></div></div></section><section id="rooms" class="shell section rooms-section"><div class="section-heading reveal"><div><p class="eyebrow">03 / THE RESIDENCE</p><h2>Choose your<br><em>room.</em></h2></div><p>Every room is a focused<br>state of mind.</p></div><div id="room-list" class="room-list"></div></section><section id="agent-view" class="shell agent-view" hidden aria-live="polite"></section><section id="broadcast" class="shell section"><div class="broadcast-card reveal"><div class="orbit">S</div><div><p class="eyebrow">SOPHIA OVERRIDE / BROADCAST</p><h2>One voice.<br><em>Every room.</em></h2><p>Local simulation only. Route a clear intention through the estate and let the crew answer in its own voice.</p><a class="text-link" href="#deck">Open the manager's deck <span>↗</span></a></div></div></section></main><div id="toast-region" class="toast-region" aria-live="polite"></div><div id="chat-modal" class="modal" hidden><div class="backdrop" data-close></div><section class="chat-panel" role="dialog" aria-modal="true" aria-labelledby="chat-title"><button class="modal-close" data-close aria-label="Close chat">×</button><div class="chat-head"><div id="chat-portrait" class="mini-portrait">R</div><div><p class="eyebrow">PRIVATE ROOM THREAD</p><h2 id="chat-title"></h2><p id="chat-subtitle"></p></div></div><div class="simulation-banner">Local simulation — external execution happens through the KYLA backend bridge when online.</div><div id="chat-log" class="chat-log" aria-live="polite"></div><form id="chat-form" class="chat-form"><label class="sr-only" for="chat-input">Message agent</label><input id="chat-input" placeholder="Type a command or question ↗" autocomplete="off"><button class="button" type="submit">Send</button></form></section></div><div class="command-dock"><div class="dock-label"><i></i><b>KYLA</b><small>command surface</small></div><form id="global-command-form" class="global-command"><label class="sr-only" for="global-command">Global command</label><input id="global-command" placeholder="Route a command to the best agent ↗" autocomplete="off"><button type="submit" aria-label="Send global command">↗</button></form><a class="dock-deck" href="#deck">SOPHIA<small>deck</small></a></div><footer class="site-footer shell"><div><a class="wordmark" href="#top">KYLA<em>—</em></a><p>built by Mel — M3lcharagu</p></div><div><p>KYLA PRINCIPLES</p><strong>legal, minimal resources, fast, budget-friendly</strong></div><div><i>✦</i><p>cloud-first execution</p></div></footer></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#11100e">
+  <meta name="description" content="KYLA — a cinematic Kilimani estate command centre for trading, dev, content, and life.">
+  <title>KYLA — Kilimani Penthouse Estate</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="immersive.css">
+  <link rel="stylesheet" href="command-center.css">
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js" defer onerror="document.documentElement.classList.add('three-unavailable')"></script>
+  <script src="script.js" defer></script>
+  <script src="immersive.js" defer></script>
+  <script src="command-center.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#dashboard">Skip to dashboard</a>
+  <header class="site-header" id="top">
+    <a class="wordmark" href="#top">KYLA<em>◆</em></a>
+    <nav aria-label="Primary">
+      <a href="#top">HOME</a>
+      <a href="#dashboard">DASHBOARD</a>
+      <a href="#estate">ESTATE</a>
+      <a href="#agents">AGENTS</a>
+      <a href="#deck">SOPHIA</a>
+    </nav>
+    <a class="header-state" href="#dashboard"><i></i> LOCAL SYSTEM ONLINE</a>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy reveal">
+        <p class="eyebrow">KILIMANI / NAIROBI — PRIVATE ESTATE</p>
+        <h1 id="hero-title">The <em>working</em><br>penthouse.</h1>
+        <p class="hero-lede">A warm, quiet command centre above a leafy suburb — with a skyline view, a pool, and a crew for every useful move.</p>
+        <div class="hero-actions">
+          <a class="button immersive-launch" href="#estate">ENTER ESTATE <span>↗</span></a>
+          <a class="text-link" href="#dashboard">OPEN COMMAND CENTRE <span>↗</span></a>
+        </div>
+      </div>
+      <div class="estate-stage" aria-hidden="true">
+        <canvas id="scene-canvas"></canvas>
+        <div class="css-fallback" aria-hidden="true">
+          <div class="fallback-tower"><b></b></div>
+          <div class="fallback-villa villa-a"></div>
+          <div class="fallback-villa villa-b"></div>
+          <div class="fallback-pool"></div>
+          <div class="fallback-palm palm-a">◒</div>
+          <div class="fallback-palm palm-b">◒</div>
+        </div>
+        <div class="stage-caption"><span>EST. 2024 <strong>K</strong></span><span>PRIVATE / CLOUD-FIRST</span></div>
+        <div class="scroll-cue"><b>01</b><i></i>SCROLL TO EXPLORE</div>
+        <div id="weather-badge" class="weather-badge" aria-live="polite">Golden hour · clear</div>
+      </div>
+    </section>
+
+    <section id="dashboard" class="command-dashboard shell" aria-labelledby="dashboard-title">
+      <div class="dashboard-heading reveal">
+        <div>
+          <p class="eyebrow">00 / KYLA OPERATIONS</p>
+          <h2 id="dashboard-title">One surface.<br><em>Every next move.</em></h2>
+        </div>
+        <p>Useful status at a glance, local-only by design. Pick a room, route a command, or open an agent thread.</p>
+      </div>
+      <div class="dashboard-grid">
+        <article class="dashboard-card dashboard-card-wide">
+          <div class="dashboard-card-heading"><div><p class="eyebrow">LIVE INVENTORY</p><h3>Command centre</h3></div><span class="live-pill"><i></i>LOCAL</span></div>
+          <div class="metric-grid">
+            <div><strong id="cc-stat-rooms">14</strong><span>rooms</span></div>
+            <div><strong id="cc-stat-agents">7</strong><span>command agents</span></div>
+            <div><strong id="cc-stat-active">7</strong><span>available now</span></div>
+            <div><strong id="cc-stat-commands">0</strong><span>local commands</span></div>
+          </div>
+          <div class="dashboard-links"><a class="button" href="#agents">OPEN AGENTS <span>↗</span></a><a class="text-link" href="#rooms">BROWSE ROOMS <span>↗</span></a></div>
+        </article>
+        <article class="dashboard-card">
+          <p class="eyebrow">USEFUL / SKIP</p>
+          <h3>Audit panel</h3>
+          <ul class="audit-list">
+            <li><b class="flag useful">USEFUL</b><span>room routing + seven local agent threads</span></li>
+            <li><b class="flag useful">USEFUL</b><span>touch-sized controls and mobile stacking</span></li>
+            <li><b class="flag useful">USEFUL</b><span>R3 quant lab remains available from Trading Room</span></li>
+            <li><b class="flag skip">SKIP</b><span>real provider calls, orders, and external execution</span></li>
+          </ul>
+        </article>
+        <article class="dashboard-card activity-card">
+          <p class="eyebrow">LOCAL ACTIVITY</p>
+          <h3>Recent commands</h3>
+          <div id="cc-activity" class="cc-activity" aria-live="polite"><p class="empty-state">No commands yet. The surface is ready.</p></div>
+        </article>
+      </div>
+      <div class="room-rail" aria-label="Room shortcuts">
+        <span class="eyebrow">ROOM ROUTER</span>
+        <a href="#room-r1">R1 HUMANITAS</a><a href="#room-r4">R4 INDUSTRIA</a><a href="#room-r3">R3 TEMPERANTIA</a><a href="#room-r2">R2 PATIENTIA</a><a href="#room-r5">R5 LUXURIA</a><a href="#room-r7">R7 SUPERBIA</a>
+      </div>
+    </section>
+
+    <section id="estate" class="signal-bar shell reveal">
+      <div><b>14</b><small>ROOMS<br>one connected house</small></div>
+      <div><b>07</b><small>AGENTS<br>the working crew</small></div>
+      <div><b>01</b><small>STANDARD<br>quiet excellence</small></div>
+      <p>Make the complex feel<br>like coming home.</p>
+    </section>
+
+    <section id="deck" class="shell section deck-section">
+      <div class="section-heading reveal"><div><p class="eyebrow">02 / THE MANAGER'S DECK</p><h2>The house has<br><em>a point of view.</em></h2></div><p>One surface for every thread. One standard for every move.</p></div>
+      <div class="deck-grid">
+        <div class="deck-copy reveal"><p class="large-copy">KYLA is not another dashboard. It is the place where every thread gets a room, a rhythm, and a next move.</p><p>At the centre is <strong>SOPHIA</strong> — the overseer persona. She keeps rooms in conversation, routes work to the right specialist, and holds the standard when the day gets loud.</p><p class="simulation-note"><i></i> LOCAL SIMULATION / FUTURE BACKEND BRIDGE<br><small>Commands here never pretend external work completed.</small></p></div>
+        <article class="sophia-card reveal"><small>00 / 01 — ACTIVE PERSONA</small><b>S</b><span>THE OVERSEER</span><strong>SOPHIA</strong><em>“Clarity is a form of kindness.”</em><footer>strategy <i>◆</i> routing <i>◆</i> standard</footer></article>
+      </div>
+      <div class="deck-dashboard reveal">
+        <div class="dashboard-title"><div><p class="eyebrow">MASTER DECK</p><h3>All agents, one pulse.</h3></div><label class="toggle"><input id="mute-toggle" type="checkbox"><span></span>Mute proactive angels</label></div>
+        <div id="status-grid" class="status-grid"></div>
+        <div class="settings-panel"><div><p class="eyebrow">SOPHIA SETTINGS</p><h3>Set the atmosphere.</h3></div><label>Season<select id="season-select"><option value="dry">Dry</option><option value="rainy">Rainy</option><option value="harmattan">Harmattan (cold)</option><option value="christmas">Christmas</option></select></label><label>Time of day <output id="time-output">18:00</output><input id="time-slider" type="range" min="0" max="24" value="18" step=".25"></label><button id="christmas-toggle" class="button subtle" type="button">Toggle Christmas mode</button></div>
+      </div>
+      <div id="agent-directory" hidden></div>
+      <div class="broadcast-row reveal"><div><p class="eyebrow">SOPHIA OVERRIDE / BROADCAST</p><h2>One voice.<br><em>Every room.</em></h2><p>Send a local simulation to the whole crew. Each mapped agent replies in its own voice.</p></div><div><form id="broadcast-form" class="command-form"><label class="sr-only" for="broadcast-input">Broadcast command</label><input id="broadcast-input" placeholder="Align today's top three priorities ↗" autocomplete="off"><button class="button" type="submit">Broadcast <span>↗</span></button></form><div id="broadcast-log" class="broadcast-log" aria-live="polite"><i></i> SOPHIA standing by for an override.</div></div></div>
+    </section>
+
+    <section id="rooms" class="shell section rooms-section">
+      <div class="section-heading reveal"><div><p class="eyebrow">03 / THE RESIDENCE</p><h2>Choose your<br><em>room.</em></h2></div><p>Every room is a focused<br>state of mind.</p></div>
+      <div id="room-list" class="room-list" aria-label="Estate rooms"></div>
+    </section>
+
+    <section id="agents" class="shell section command-center-section" aria-labelledby="agents-title">
+      <div class="section-heading reveal"><div><p class="eyebrow">04 / AGENT COMMAND CENTRE</p><h2>Seven operators.<br><em>One local thread.</em></h2></div><p>Each card routes to its linked room and keeps a small mock conversation in this browser.</p></div>
+      <div id="command-center-grid" class="command-center-grid" aria-live="polite"></div>
+    </section>
+
+    <section id="agent-view" class="shell agent-view" hidden aria-live="polite"></section>
+    <section id="broadcast" class="shell section"><div class="broadcast-card reveal"><div class="orbit">S</div><div><p class="eyebrow">SOPHIA OVERRIDE / BROADCAST</p><h2>One voice.<br><em>Every room.</em></h2><p>Local simulation only. Route a clear intention through the estate and let the crew answer in its own voice.</p><a class="text-link" href="#deck">Open the manager's deck <span>↗</span></a></div></div></section>
+  </main>
+
+  <div id="toast-region" class="toast-region" aria-live="polite"></div>
+  <div id="chat-modal" class="modal" hidden>
+    <div class="backdrop" data-close></div>
+    <section class="chat-panel" role="dialog" aria-modal="true" aria-labelledby="chat-title">
+      <button class="modal-close" data-close aria-label="Close chat">×</button>
+      <div class="chat-head"><div id="chat-portrait" class="mini-portrait">R</div><div><p class="eyebrow">PRIVATE ROOM THREAD</p><h2 id="chat-title"></h2><p id="chat-subtitle"></p></div></div>
+      <div class="simulation-banner">Local simulation — external execution happens through the KYLA backend bridge when online.</div>
+      <div id="chat-log" class="chat-log" aria-live="polite"></div>
+      <form id="chat-form" class="chat-form"><label class="sr-only" for="chat-input">Message agent</label><input id="chat-input" placeholder="Type a command or question ↗" autocomplete="off"><button class="button" type="submit">Send</button></form>
+    </section>
+  </div>
+
+  <div class="command-dock"><div class="dock-label"><i></i><b>KYLA</b><small>command surface</small></div><form id="global-command-form" class="global-command"><label class="sr-only" for="global-command">Global command</label><input id="global-command" placeholder="Route a command to the best agent ↗" autocomplete="off"><button type="submit" aria-label="Send global command">↗</button></form><a class="dock-deck" href="#deck">SOPHIA<small>deck</small></a></div>
+  <footer class="site-footer shell"><div><a class="wordmark" href="#top">KYLA<em>◆</em></a><p>built by Mel ◆ M3lcharagu</p></div><div><p>KYLA PRINCIPLES</p><strong>legal, minimal resources, fast, budget-friendly</strong></div><div><i>◆</i><p>cloud-first execution</p></div></footer>
+</body>
+</html>
