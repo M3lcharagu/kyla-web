@@ -1,0 +1,321 @@
+:root {
+  --dashboard-ink: #17151a;
+  --dashboard-muted: #6f665f;
+  --dashboard-paper: #f5f0e8;
+  --dashboard-panel: rgba(255, 255, 255, 0.78);
+  --dashboard-line: rgba(23, 21, 26, 0.14);
+  --dashboard-accent: #b46b42;
+  --dashboard-accent-soft: #e8c6a7;
+}
+
+.dashboard-grid,
+.revenue-grid,
+.product-grid,
+.portfolio-group,
+.testimonial-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.dashboard-grid {
+  grid-template-columns: minmax(0, 1.8fr) minmax(16rem, 1fr);
+  align-items: start;
+}
+
+.revenue-grid {
+  grid-template-columns: minmax(0, 1.2fr) minmax(16rem, 0.8fr);
+  align-items: start;
+}
+
+.panel,
+.product-card,
+.portfolio-card,
+.testimonial-slot,
+.contact-card,
+.room-card {
+  border: 1px solid var(--dashboard-line);
+  border-radius: 1.25rem;
+  background: var(--dashboard-panel);
+  box-shadow: 0 1rem 2.5rem rgba(23, 21, 26, 0.08);
+}
+
+.panel {
+  padding: clamp(1rem, 2vw, 1.5rem);
+}
+
+.panel-wide {
+  min-width: 0;
+}
+
+.panel-heading,
+.section-heading,
+.goal-stats,
+.card-actions,
+.contact-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.panel-heading {
+  margin-bottom: 1rem;
+}
+
+.panel-heading h3,
+.product-card h3,
+.portfolio-card h4,
+.testimonial-slot p,
+.contact-card h2 {
+  margin: 0;
+}
+
+.eyebrow,
+.source-path,
+.placeholder-note,
+.loading-state,
+.panel-heading,
+.goal-form small,
+.card-actions,
+.portfolio-meta,
+.contact-note {
+  color: var(--dashboard-muted);
+}
+
+.live-pill,
+.goal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid var(--dashboard-line);
+  border-radius: 999px;
+  padding: 0.35rem 0.65rem;
+  color: var(--dashboard-ink);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.live-pill i {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: #4f8c63;
+}
+
+.metric-grid,
+.goal-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.metric-grid > div,
+.goal-stats > div {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.metric-grid strong,
+.goal-stats strong {
+  color: var(--dashboard-ink);
+  font-size: clamp(1.15rem, 2vw, 1.8rem);
+}
+
+.metric-grid span,
+.goal-stats span {
+  color: var(--dashboard-muted);
+  font-size: 0.78rem;
+}
+
+.activity-log {
+  min-height: 5rem;
+  margin-top: 1rem;
+  border-top: 1px solid var(--dashboard-line);
+  padding-top: 1rem;
+}
+
+.empty-state {
+  color: var(--dashboard-muted);
+  font-style: italic;
+}
+
+.audit-list {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.audit-list li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.6rem;
+  align-items: start;
+}
+
+.flag {
+  border-radius: 999px;
+  padding: 0.22rem 0.45rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.flag.useful {
+  background: #dbe9dc;
+  color: #285d36;
+}
+
+.flag.skip {
+  background: #f3ded7;
+  color: #8a3f30;
+}
+
+.progress-track {
+  position: relative;
+  overflow: hidden;
+  height: 0.7rem;
+  margin: 1.25rem 0;
+  border-radius: 999px;
+  background: rgba(23, 21, 26, 0.1);
+}
+
+#goal-progress {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--dashboard-accent), var(--dashboard-accent-soft));
+  transition: width 180ms ease;
+}
+
+.goal-form {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.goal-form label {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--dashboard-ink);
+  font-weight: 600;
+}
+
+.goal-form input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--dashboard-line);
+  border-radius: 0.7rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.75);
+  color: inherit;
+  font: inherit;
+}
+
+.product-grid,
+.portfolio-cards,
+.testimonial-grid {
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+}
+
+.product-card,
+.portfolio-card,
+.testimonial-slot {
+  padding: 1.1rem;
+}
+
+.product-card {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.product-card .source-path {
+  font-size: 0.72rem;
+  overflow-wrap: anywhere;
+}
+
+.product-card .outcome,
+.product-card .placeholder-note {
+  margin: 0;
+}
+
+.price {
+  color: var(--dashboard-accent);
+  font-weight: 700;
+}
+
+.card-actions {
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+.card-actions .button {
+  flex: 1 1 10rem;
+}
+
+.portfolio-image {
+  display: grid;
+  min-height: 7rem;
+  place-items: center;
+  border: 1px dashed var(--dashboard-line);
+  border-radius: 0.85rem;
+  color: var(--dashboard-muted);
+  text-align: center;
+}
+
+.portfolio-meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem 1rem;
+  margin: 1rem 0 0;
+}
+
+.portfolio-meta dt {
+  font-weight: 700;
+}
+
+.portfolio-meta dd {
+  margin: 0;
+}
+
+.testimonial-slot {
+  min-height: 8rem;
+}
+
+.testimonial-slot span,
+.testimonial-slot small {
+  color: var(--dashboard-muted);
+}
+
+.contact-card {
+  display: grid;
+  gap: 1rem;
+  max-width: 52rem;
+  margin-inline: auto;
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+.contact-actions {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 760px) {
+  .dashboard-grid,
+  .revenue-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .metric-grid,
+  .goal-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .panel-heading,
+  .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

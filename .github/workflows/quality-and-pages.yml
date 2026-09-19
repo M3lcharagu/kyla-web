@@ -1,0 +1,75 @@
+name: Quality and GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install static-site linters
+        run: npm install --no-save --no-package-lock htmlhint@1.1.4 eslint@9.17.0 stylelint@16.11.0
+      - name: Lint HTML
+        run: npx htmlhint --config .htmlhintrc index.html
+      - name: Lint CSS
+        run: npx stylelint --config .stylelintrc.json '**/*.css'
+      - name: Parse JavaScript
+        run: npx eslint --config eslint.config.js '*.js'
+      - name: Verify local assets and JSON
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const html = fs.readFileSync('index.html', 'utf8');
+          const references = [...html.matchAll(/(?:src|href)="([^"]+)"/g)]
+            .map((match) => match[1])
+            .filter((ref) => !ref.startsWith('#') && !ref.startsWith('http') && !ref.startsWith('mailto:'));
+          for (const ref of references) {
+            const localPath = path.join(process.cwd(), ref.split('?')[0]);
+            if (!fs.existsSync(localPath)) throw new Error(`Missing local asset: ${ref}`);
+          }
+          for (const file of ['manifest.json', 'products.json', 'portfolio.json']) JSON.parse(fs.readFileSync(file, 'utf8'));
+          const manifest = JSON.parse(fs.readFileSync('manifest.json', 'utf8'));
+          for (const icon of manifest.icons) {
+            if (!fs.existsSync(path.join(process.cwd(), icon.src))) throw new Error(`Missing manifest icon: ${icon.src}`);
+          }
+          for (const required of ['sw.js', 'manifest.json', 'dashboard.css']) {
+            if (!fs.existsSync(required)) throw new Error(`Missing required dashboard asset: ${required}`);
+          }
+          console.log('Local asset references and JSON payloads are valid.');
+          NODE
+  deploy:
+    needs: lint
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload static site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
